@@ -8,6 +8,8 @@
   const FULL_MSG = matchMedia('(max-width: 599px), (min-width: 600px) and (max-height: 520px)');
   const PHONE = matchMedia('(max-width: 599px)');
   const sleep = ms => new Promise(r => setTimeout(r, ms));
+  // События для интерактивного тура (js/tour.js).
+  const emit = (name, detail) => window.dispatchEvent(new CustomEvent('otmaz:' + name, { detail }));
   const rnd = (a, b) => a + Math.random() * (b - a);
 
   function h(tag, cls, text) {
@@ -74,6 +76,7 @@
       }
     }
     ENTER[name](prev, opts);
+    emit('screen', name);
     if (prev && !opts.silent) (name === 'pay' ? Snd.open() : Snd.whoosh());
   }
 
@@ -400,6 +403,8 @@
     return bot;
   }
 
+  // Темп «нейросети»: шаги рассуждения и печать медленные, чтобы шутки успевали прочитать.
+  const SPEED = { word: 115, rewriteWord: 100, stepSpin: [1000, 1300], stepRead: 750, beforeAnswer: 900 };
   const fmtSec = ms => (ms / 1000).toFixed(1).replace('.', ',') + ' с';
 
   function appendWords(p, text, run, speed) {
@@ -412,7 +417,7 @@
         p.appendChild(s);
         p.appendChild(caret);
         if (i % 2 === 0) Snd.tick();
-        const pause = /[.!?]$/.test(words[i]) ? speed * 3.2 : /[,—:]$/.test(words[i]) ? speed * 1.8 : 0;
+        const pause = /[.!?]$/.test(words[i]) ? speed * 2.6 : /[,—:]$/.test(words[i]) ? speed * 1.2 : 0;
         await sleep(speed * rnd(0.7, 1.3) + pause);
       }
       caret.remove();
@@ -420,7 +425,7 @@
     })();
   }
 
-  async function stream(el, text, level, run, speed = 40) {
+  async function stream(el, text, level, run, speed = SPEED.word) {
     el.innerHTML = '';
     el.classList.toggle('is-tele', level === -1);
     for (const para of text.split('\n')) {
@@ -533,17 +538,19 @@
       $('.st-r', li).textContent = result;
       bot.steps.appendChild(li);
       requestAnimationFrame(() => li.classList.add('in'));
-      await sleep(rnd(560, 820));
+      await sleep(rnd(SPEED.stepSpin[0], SPEED.stepSpin[1]));
       if (!alive()) { clearInterval(timer); return; }
       li.classList.add('done');
       Snd.step();
-      await sleep(140);
+      await sleep(SPEED.stepRead);
     }
     clearInterval(timer);
     const spent = performance.now() - t0;
     bot.thinkLabel.classList.remove('shimmer');
     bot.thinkLabel.textContent = `Рассуждал ${fmtSec(spent)}`;
     bot.thinkTime.textContent = `· ${steps.length} шага`;
+    await sleep(SPEED.beforeAnswer);
+    if (!alive()) return;
     bot.think.classList.add('is-collapsed');
     Orb.energy(0.4);
 
@@ -561,6 +568,7 @@
     bot.actions.classList.add('in');
     await sleep(90);
     bot.sendBoss.classList.add('in');
+    setTimeout(() => emit('gen:done'), 450);
     busy = false;
     updateSend();
     setTimeout(() => { if (run === genRun) follow = false; }, 900);
@@ -595,13 +603,14 @@
     bot.text = res.text;
     bot.answer.classList.remove('is-dim');
     Orb.energy(0.45);
-    const ok = await stream(bot.answer, res.text, level, run, level >= 3 ? 30 : 36);
+    const ok = await stream(bot.answer, res.text, level, run, SPEED.rewriteWord);
     if (!ok) return;
     bot.note.classList.remove('on');
     Orb.energy(0);
     Snd.done();
     busy = false;
     setActions(bot, true);
+    emit('rewrite:done', { level: bot.level });
     updateResult(bot, res);
     updateSend();
     setTimeout(() => { if (run === genRun) follow = false; }, 900);
@@ -732,6 +741,7 @@
       : '<svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>')
       + `<b>${ok ? 'Шеф поверил' : 'Не прокатило'}</b><span>Счёт ${score.win}:${score.lose}</span>`;
     phBody.appendChild(verdict);
+    setTimeout(() => emit('msg:verdict', { ok }), 700);
     popIn(verdict, 'translateY(10px) scale(.9)');
     if (ok) { Snd.done(); Orb.poke(); } else { Snd.fail(); Orb.energy(0.6); setTimeout(() => Orb.energy(0), 1600); }
     $('#msg-replay span').textContent = ok ? 'Ещё раз' : 'Ещё попытка';
@@ -749,6 +759,7 @@
     resetPay();
     msgRun++;
     score.win = score.lose = 0;
+    emit('reset');
     $$('#hist button').forEach(x => x.classList.remove('cur'));
   }
 
@@ -789,6 +800,16 @@
     }
     e.preventDefault();
   });
+
+  // Тур читает текущее состояние генератора и умеет начать всё с чистого листа.
+  window.OtmazApp = {
+    get screen() { return current; },
+    get bot() { return curBot; },
+    get busy() { return busy; },
+    get emptyVisible() { return !empty.hidden; },
+    restart() { go('home', { reset: true, force: true }); },
+    closeDrawer() { setDrawer(false); },
+  };
 
   /* ---------- старт ---------- */
   renderLists();
