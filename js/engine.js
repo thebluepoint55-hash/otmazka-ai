@@ -2,7 +2,7 @@
 window.Engine = (() => {
   const { SITUATIONS, PHRASES, LEVELS, THINK_GENERIC } = window.OTMAZ_DATA;
   const MIN_LEVEL = -1, MAX_LEVEL = 4, DEFAULT_LEVEL = 1;
-  const used = {};
+  const used = {}, lastReply = {};
   let gender = 'm';
   try { gender = localStorage.getItem('otmaz-gender') === 'f' ? 'f' : 'm'; } catch (e) {}
 
@@ -95,10 +95,20 @@ window.Engine = (() => {
     ];
   }
 
-  function bossReply(c, level) {
-    const R = SITUATIONS[c.sit].replies;
-    const list = level <= 0 ? R.dry : level <= 2 ? R.normal : level === 3 ? R.high : R.tragedy;
-    return g(pickFrom(list, c.reply));
+  // Исход — чистый случай 50/50. Возвращает массив сообщений начальника.
+  function bossReply(c, level, ok) {
+    const R = window.OTMAZ_DATA.REPLIES[c.sit][ok ? 'ok' : 'fail'];
+    const list = ok
+      ? (level <= 0 ? R.dry : level <= 2 ? R.normal : level === 3 ? R.high : R.tragedy)
+      : (level <= 0 ? R.dry : level <= 2 ? R.normal : R.drama);
+    // Одна и та же реплика не выпадает два раза подряд.
+    const key = c.sit + ok + list.length + list[0];
+    let i = rnd(list.length);
+    if (list.length > 1 && i === lastReply[key]) i = (i + 1 + rnd(list.length - 1)) % list.length;
+    lastReply[key] = i;
+    const pick = list[i];
+    const s = cap(g(SITUATIONS[c.sit].items[c.idx].s));
+    return (Array.isArray(pick) ? pick : [pick]).map(t => g(t).replace('{s}', s));
   }
 
   return {

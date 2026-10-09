@@ -111,6 +111,32 @@ window.Sound = (() => {
     shorter() { noise({ dur: 0.04, vol: 0.12, f: 5200, q: 2 }); noise({ at: 0.07, dur: 0.04, vol: 0.1, f: 6200, q: 2 }); tone({ f: 1200, f2: 600, dur: 0.12, vol: 0.03 }); },
     send() { noise({ dur: 0.28, vol: 0.1, f: 900, f2: 4200, q: 0.8, attack: 0.02 }); tone({ f: 600, f2: 1400, dur: 0.16, vol: 0.04 }); },
     receive() { tone({ f: 1046.5, dur: 0.14, vol: 0.1 }); tone({ f: 1568, at: 0.11, dur: 0.3, vol: 0.09 }); },
+    // «Не прокатило»: грустный тромбон, последняя нота с вибрато.
+    fail() {
+      if (!enabled || !ensure()) return;
+      const notes = [[293.7, 0, 0.32], [277.2, 0.36, 0.32], [261.6, 0.72, 0.32], [246.9, 1.08, 1.1]];
+      notes.forEach(([f, at, dur], i) => {
+        const t = ctx.currentTime + at;
+        const o = ctx.createOscillator(), gn = ctx.createGain(), lp = ctx.createBiquadFilter();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(f * 1.02, t);
+        o.frequency.exponentialRampToValueAtTime(f, t + 0.08);
+        if (i === notes.length - 1) {
+          const lfo = ctx.createOscillator(), lg = ctx.createGain();
+          lfo.frequency.value = 5.5; lg.gain.value = 6;
+          lfo.connect(lg); lg.connect(o.frequency);
+          lfo.start(t + 0.15); lfo.stop(t + dur);
+          o.frequency.exponentialRampToValueAtTime(f * 0.94, t + dur);
+        }
+        lp.type = 'lowpass'; lp.frequency.value = 1100; lp.Q.value = 2;
+        gn.gain.setValueAtTime(0.0001, t);
+        gn.gain.exponentialRampToValueAtTime(0.16, t + 0.03);
+        gn.gain.setValueAtTime(0.16, t + dur * 0.7);
+        gn.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(lp); lp.connect(gn); gn.connect(master);
+        o.start(t); o.stop(t + dur + 0.05);
+      });
+    },
     pop() { tone({ f: 420, f2: 900, dur: 0.09, vol: 0.06 }); },
   };
   return api;

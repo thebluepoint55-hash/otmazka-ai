@@ -628,6 +628,7 @@
   /* ---------- мессенджер: финал ролика ---------- */
   const phBody = $('#ph-body'), phField = $('#ph-field'), phSend = $('#ph-send'), phState = $('#ph-state'), msgCtrl = $('#msg-ctrl');
   let msgRun = 0;
+  const score = { win: 0, lose: 0 };
   const hhmm = d => d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0');
   const TICKS = '<span class="ticks"><svg class="t1" viewBox="0 0 17 11"><path d="M1 6l3.2 3.2L11 2"/></svg><svg class="t2" viewBox="0 0 17 11"><path d="M6.5 8.4l.8.8L14 2"/></svg></span>';
 
@@ -646,7 +647,9 @@
     let choice, level, text;
     if (curBot && curBot.text) { choice = curBot.choice; level = curBot.level; text = curBot.text; }
     else { choice = E.createChoice('absent'); level = E.DEFAULT_LEVEL; text = E.compose(choice, level).text; }
-    const reply = E.bossReply(choice, level);
+    // Сработает или нет — чистый случай, правдоподобие тут ничего не гарантирует.
+    const ok = Math.random() < 0.5;
+    const replies = E.bossReply(choice, level, ok);
 
     const now = new Date();
     $('#ph-clock').textContent = hhmm(now);
@@ -683,25 +686,53 @@
     $('.ticks', out).classList.add('read');
     phState.textContent = 'в сети';
 
-    await sleep(700);
-    if (!alive()) return;
-    phState.textContent = 'печатает…';
-    phState.classList.add('is-typing');
     const typing = h('div', 'bb-typing');
     typing.innerHTML = '<i></i><i></i><i></i>';
-    phBody.appendChild(typing);
-    popIn(typing, 'translateY(10px) scale(.8)');
+    const setTyping = on => {
+      phState.textContent = on ? 'печатает…' : 'в сети';
+      phState.classList.toggle('is-typing', on);
+      if (on) { phBody.appendChild(typing); popIn(typing, 'translateY(10px) scale(.8)'); }
+      else typing.remove();
+    };
 
-    await sleep(1500 + Math.min(1300, reply.length * 35));
+    await sleep(700);
     if (!alive()) return;
-    typing.remove();
-    const back = bubble('bb-in', reply, hhmm(new Date(now.getTime() + 60000)));
-    phBody.appendChild(back);
-    popIn(back, 'translateY(16px) scale(.86)');
-    Snd.receive();
-    phState.textContent = 'в сети';
-    phState.classList.remove('is-typing');
-    Orb.poke();
+    // Перед отказом шеф начинает печатать, передумывает и пишет снова — как вживую.
+    if (!ok) {
+      setTyping(true);
+      await sleep(1300);
+      if (!alive()) return;
+      setTyping(false);
+      await sleep(1100);
+      if (!alive()) return;
+    }
+    let t = now.getTime() + 60000;
+    for (let i = 0; i < replies.length; i++) {
+      setTyping(true);
+      await sleep((i ? 900 : 1400) + Math.min(1300, replies[i].length * 32));
+      if (!alive()) return;
+      setTyping(false);
+      const back = bubble('bb-in', replies[i], hhmm(new Date(t)));
+      phBody.appendChild(back);
+      popIn(back, 'translateY(16px) scale(.86)');
+      Snd.receive();
+      await sleep(450);
+      if (!alive()) return;
+    }
+
+    // Итог — служебной плашкой, как в мессенджерах.
+    ok ? score.win++ : score.lose++;
+    await sleep(500);
+    if (!alive()) return;
+    const verdict = h('div', 'ph-verdict ' + (ok ? 'is-ok' : 'is-fail'));
+    verdict.innerHTML = (ok
+      ? '<svg viewBox="0 0 20 20"><path d="m5 10.5 3.2 3.2L15 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : '<svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>')
+      + `<b>${ok ? 'Шеф поверил' : 'Не прокатило'}</b><span>Счёт ${score.win}:${score.lose}</span>`;
+    phBody.appendChild(verdict);
+    popIn(verdict, 'translateY(10px) scale(.9)');
+    if (ok) { Snd.done(); Orb.poke(); } else { Snd.fail(); Orb.energy(0.6); setTimeout(() => Orb.energy(0), 1600); }
+    $('#msg-replay span').textContent = ok ? 'Ещё раз' : 'Ещё попытка';
 
     await sleep(1000);
     if (!alive()) return;
