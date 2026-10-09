@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отмаз Pro · ОТМАЗ-4 Turbo</title>
+<style>html,body{background:#F3F4F8;margin:0}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap&subset=cyrillic" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body data-screen="home">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gRing" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6D5BFF"/><stop offset=".6" stop-color="#FF7AC6"/><stop offset="1" stop-color="#57D8FF"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="bg" aria-hidden="true"></div>
+<div id="orb" class="orb" aria-hidden="true"><canvas></canvas></div>
+
+<!-- ============ 1. ГЛАВНАЯ ============ -->
+<section class="screen screen-home" id="home" aria-label="Главная">
+  <nav class="nav">
+    <a class="logo" href="#" data-go="home"><i class="logo-mark"></i>отмаз.ai</a>
+    <div class="nav-links">
+      <a href="#" class="nav-link">Модели</a>
+      <a href="#" class="nav-link">Тарифы</a>
+      <a href="#" class="nav-link">Для бизнеса</a>
+    </div>
+    <span class="model-tag"><i class="live"></i>ОТМАЗ-4 Turbo</span>
+    <button class="btn-ink" data-go="pay">Войти</button>
+  </nav>
+
+  <div class="hero">
+    <div class="orb-zone" data-in style="--i:0">
+      <div class="orb-slot" id="slot-home"><i class="ring"></i><i class="ring"></i></div>
+      <div class="ctx" style="--x:-250px;--y:-58px;--f:0s"><div class="ctx-in"><span class="ctx-k">Погода</span>+4°, мокрый снег</div></div>
+      <div class="ctx" style="--x:232px;--y:-12px;--f:-2.4s"><div class="ctx-in"><span class="ctx-k">Пробки</span>8 баллов</div></div>
+      <div class="ctx" style="--x:-206px;--y:78px;--f:-4.1s"><div class="ctx-in"><span class="ctx-k">Шеф</span>раздражён на 34%</div></div>
+    </div>
+
+    <a href="#" class="announce" data-in style="--i:1" data-go="pay"><b>Новинка</b>ОТМАЗ-4 Turbo врёт на 38% убедительнее<span class="arr">→</span></a>
+
+    <h1 class="hero-h" data-in style="--i:2">Нейросеть,<br>которая <span class="grad">врёт<br>начальнику</span> за вас</h1>
+
+    <p class="hero-p" data-in style="--i:3">Обучена на 14 млн объяснительных. Учитывает пробки, погоду и настроение шефа.</p>
+
+    <div class="hero-ctas" data-in style="--i:4">
+      <button class="cta cta-main" data-go="pay">Попробовать Pro<span class="arr">→</span></button>
+      <button class="cta cta-ghost" data-demo><i class="play"></i>Смотреть демо</button>
+    </div>
+    <p class="hero-micro" data-in style="--i:5">Отмена в любой момент · Совесть не требуется · 0 увольнений</p>
+  </div>
+
+  <div class="trust" data-in style="--i:6">
+    <span class="trust-k">Нам доверяют</span>
+    <span class="wm wm-1"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 5v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Опоздуны</span>
+    <span class="wm wm-2">ПРОГУЛЬЩИКИ</span>
+    <span class="wm wm-3"><svg viewBox="0 0 20 20"><path d="M3 9.5 10 4l7 5.5V16H3z" fill="currentColor"/></svg>удалёнщики</span>
+    <span class="wm wm-4">Вечно больные<sup>®</sup></span>
+    <span class="wm wm-5"><svg viewBox="0 0 20 20"><path d="M3 15 8 9l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>отдел продаж</span>
+  </div>
+</section>
+
+<!-- ============ 2. ОПЛАТА ============ -->
+<section class="screen screen-pay" id="pay" aria-label="Оплата">
+  <div class="dim" data-close></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pay-title">
+    <div class="modal-top">
+      <span class="logo logo-sm"><i class="logo-mark"></i>отмаз.ai</span>
+      <span class="test-tag">Тестовый режим</span>
+      <button class="icon-btn" data-close aria-label="Закрыть"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <h2 id="pay-title" class="modal-h">Отмаз <span class="grad">Pro</span></h2>
+    <div class="price"><b>990 ₽</b><span>/мес</span><s>2 490 ₽</s><em>−60% для опоздавших</em></div>
+
+    <ul class="features">
+      <li>Безлимитные отмазки на ОТМАЗ-4 Turbo</li>
+      <li>Режим «Трагедия в трёх актах»</li>
+      <li>Учёт пробок, погоды и настроения шефа</li>
+    </ul>
+
+    <div class="pay-card">
+      <i class="card-chip"></i>
+      <div><b>•••• 4242</b><small>Тестовая карта · 12/29</small></div>
+      <span class="pay-sum">К оплате <b>990 ₽</b></span>
+    </div>
+
+    <div class="faceid" data-state="idle">
+      <div class="fid-box">
+        <i class="fid-pulse"></i><i class="fid-pulse"></i>
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <g class="fid-corners">
+            <path d="M14 38V24a10 10 0 0 1 10-10h14"/><path d="M82 14h14a10 10 0 0 1 10 10v14"/>
+            <path d="M106 82v14a10 10 0 0 1-10 10H82"/><path d="M38 106H24a10 10 0 0 1-10-10V82"/>
+          </g>
+          <g class="fid-face"><path d="M44 46v7M76 46v7M60 49v17h-5M47 79c7 7 19 7 26 0"/></g>
+          <g class="fid-mesh"></g>
+          <rect class="fid-line" x="18" y="18" width="84" height="3" rx="1.5"/>
+          <circle class="fid-ring" cx="60" cy="60" r="44"/>
+          <path class="fid-check" d="M41 61l13 13 26-28"/>
+        </svg>
+      </div>
+      <div class="fid-txt" aria-live="polite">Подтвердите оплату лицом</div>
+    </div>
+
+    <button class="pay-btn" id="pay-btn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2M13 3h2a2 2 0 0 1 2 2v2M17 13v2a2 2 0 0 1-2 2h-2M7 17H5a2 2 0 0 1-2-2v-2M7.5 8v1.5M12.5 8v1.5M10 8.5v3H9M7.5 13.2c1.4 1.1 3.6 1.1 5 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Оплатить лицом</span></button>
+    <p class="modal-foot">Списаний нет, данные карты не собираются. Угрызений совести тоже нет.</p>
+  </div>
+</section>
+
+<!-- ============ 3. ГЕНЕРАТОР ============ -->
+<section class="screen screen-gen" id="gen" aria-label="Генератор">
+  <aside class="side" data-in style="--i:0">
+    <div class="side-top">
+      <a class="logo" href="#" data-go="home"><i class="logo-mark"></i>отмаз.ai</a>
+      <span class="pro-badge">PRO</span>
+    </div>
+    <button class="side-new" id="new-chat"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Новая отмазка</button>
+    <nav class="hist" id="hist"></nav>
+    <div class="side-foot">
+      <div class="voice"><span>Пишу от лица</span><div class="seg" id="gender"><button data-g="m">он</button><button data-g="f">она</button></div></div>
+      <div class="plan">
+        <div class="plan-top"><b>Отмаз Pro</b><span>Безлимит</span></div>
+        <div class="plan-meter"><i></i></div>
+        <small>Совести израсходовано: 0%</small>
+      </div>
+    </div>
+  </aside>
+
+  <div class="gen-main">
+    <header class="gen-head" data-in style="--i:1">
+      <div class="gen-title" id="gen-title">Новая отмазка</div>
+      <div class="model-wrap">
+        <button class="model-pill" id="model-pill" aria-haspopup="listbox" aria-expanded="false"><i class="live"></i><span id="model-name">ОТМАЗ-4 Turbo</span><svg viewBox="0 0 20 20"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="model-menu" id="model-menu" role="listbox">
+          <button role="option" class="on" data-model="ОТМАЗ-4 Turbo"><b>ОТМАЗ-4 Turbo</b><small>Самая убедительная</small></button>
+          <button role="option" data-model="ОТМАЗ-4 mini"><b>ОТМАЗ-4 mini</b><small>Для опозданий до 15 минут</small></button>
+          <button role="option" disabled><b>ОТМАЗ-1 Честный</b><small>Говорит правду. Не рекомендуем</small></button>
+        </div>
+      </div>
+      <div class="head-actions"><button class="ghost-btn">Поделиться</button><span class="me-av">Я</span></div>
+    </header>
+
+    <div class="thread" id="thread">
+      <div class="col" id="col">
+        <div class="empty" id="empty">
+          <div class="orb-slot" id="slot-gen"></div>
+          <h2 class="empty-h" data-in style="--i:2">Что натворили?</h2>
+          <p class="empty-p" data-in style="--i:3">Опишите ситуацию — ОТМАЗ-4 Turbo подберёт объяснение, которому поверит даже бухгалтерия.</p>
+          <div class="sugg" id="sugg" data-in style="--i:4"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer" data-in style="--i:3">
+      <form class="composer-box" id="composer">
+        <textarea id="input" rows="1" placeholder="Опишите, что натворили…" aria-label="Ситуация"></textarea>
+        <div class="composer-row">
+          <span class="tool"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+          <span class="tool-pill">Драма: авто</span>
+          <span class="tool-pill">Учитывать пробки</span>
+          <button type="submit" class="send" id="send" disabled aria-label="Отправить"><svg viewBox="0 0 20 20"><path d="M10 15V5M5.5 9.5 10 5l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </form>
+      <p class="disclaimer">ОТМАЗ-4 Turbo может ошибаться. Начальник — тоже.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. МЕССЕНДЖЕР ============ -->
+<section class="screen screen-msg" id="msg" aria-label="Отправка начальнику">
+  <div class="orb-slot" id="slot-msg"></div>
+  <div class="phone-pos">
+    <div class="phone">
+      <div class="ph-screen">
+        <div class="ph-status"><b id="ph-clock">9:41</b><span class="ph-icons"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2"/><rect x="24" y="4" width="1.6" height="4" rx=".8" opacity=".4"/></svg></span></div>
+        <div class="ph-head">
+          <svg class="ph-back" viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="ph-av">ИП</span>
+          <div class="ph-who"><b>Игорь Петрович</b><small id="ph-state">был недавно</small></div>
+          <svg class="ph-call" viewBox="0 0 20 20"><path d="M6.6 3.5 8.4 7 6.9 8.6a9 9 0 0 0 4.5 4.5L13 11.6l3.5 1.8-.6 2.7c-.2.6-.8 1-1.4.9C8.6 16.4 3.6 11.4 3 5.5c0-.7.3-1.2.9-1.4z" fill="currentColor"/></svg>
+        </div>
+        <div class="ph-body" id="ph-body"></div>
+        <div class="ph-compose">
+          <span class="ph-plus"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+          <div class="ph-field" id="ph-field"><span class="ph-ph">Сообщение</span></div>
+          <button class="ph-send" id="ph-send" aria-label="Отправить"><svg viewBox="0 0 20 20"><path d="M10 15V5M5.5 9.5 10 5l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <i class="ph-home"></i>
+      </div>
+      <i class="ph-island"></i>
+    </div>
+  </div>
+  <div class="msg-ctrl" id="msg-ctrl">
+    <button class="ghost-btn" data-go="gen"><svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>К генератору</button>
+    <button class="ghost-btn" id="msg-replay"><svg viewBox="0 0 20 20"><path d="M4 10a6 6 0 1 0 1.8-4.3M4 4v3.5h3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Повторить</button>
+  </div>
+</section>
+
+<button class="sound" id="sound" aria-label="Звук" aria-pressed="true">
+  <svg class="s-on" viewBox="0 0 20 20"><path d="M4 8h3l4-3.5v11L7 12H4z" fill="currentColor"/><path d="M13.5 7.2a4 4 0 0 1 0 5.6M15.6 5.2a7 7 0 0 1 0 9.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  <svg class="s-off" viewBox="0 0 20 20"><path d="M4 8h3l4-3.5v11L7 12H4z" fill="currentColor"/><path d="m13.5 8 4 4m0-4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+</button>
+
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/orb.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
