@@ -83,6 +83,7 @@ void main(){
   const mouse = { x: -1e4, y: -1e4, speed: 0, t: 0 };
   const um = { x: 0, y: 0 };
   let energy = 0, energyTarget = 0, poke = 0, time = 0, last = 0, started = false;
+  let hidden = false, scrolled = false, lastTg = null, lastSlot = null;
 
   function compile(type, src) {
     const s = gl.createShader(type);
@@ -141,6 +142,10 @@ void main(){
     const dt = Math.min(0.033, (now - last) / 1000 || 0.016);
     last = now;
     const tg = readTarget();
+    // При прокрутке шар едет вместе с контентом, а не догоняет его пружиной.
+    if (tg && scrolled && lastTg && lastSlot === slot) { S.x += tg.x - lastTg.x; S.y += tg.y - lastTg.y; }
+    scrolled = false;
+    if (tg) { lastTg = tg; lastSlot = slot; }
     if (tg) {
       let { x, y, d } = tg;
       const R = Math.max(S.d, 1) / 2;
@@ -156,7 +161,7 @@ void main(){
         }
       }
       d *= (1 + energy * (opts.grow || 0)) * (hover ? 1.04 : 1) * (1 + poke * 0.07);
-      const o = opts.opacity == null ? 1 : opts.opacity;
+      const o = hidden ? 0 : opts.opacity == null ? 1 : opts.opacity;
       if (!started || reduce.matches) {
         S.x = x; S.y = y; S.d = started ? d : d * 0.55; S.o = started ? o : 0;
         started = true;
@@ -212,11 +217,17 @@ void main(){
         mouse.x = e.clientX; mouse.y = e.clientY; mouse.t = now;
       }, { passive: true });
       document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -1e4; });
+      // Палец «отпускает» шар — блик плавно возвращается на место.
+      const release = e => { if (e.pointerType !== 'mouse') { mouse.x = mouse.y = -1e4; mouse.speed = 0; } };
+      window.addEventListener('pointerup', release, { passive: true });
+      window.addEventListener('pointercancel', release, { passive: true });
+      document.addEventListener('scroll', () => { scrolled = true; }, { capture: true, passive: true });
       requestAnimationFrame(t => { last = t; loop(t); });
     },
     to(target, o = {}) { slot = target; opts = o; },
     get slot() { return slot; },
     energy(v) { energyTarget = v; },
+    hide(v) { hidden = !!v; },
     poke() { poke = 1; },
   };
 })();

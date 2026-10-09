@@ -4,6 +4,9 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const E = window.Engine, Snd = window.Sound, Orb = window.Orb, DATA = window.OTMAZ_DATA;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  // На телефоне (и в низком альбомном окне) мессенджер открывается на весь экран, без макета телефона.
+  const FULL_MSG = matchMedia('(max-width: 599px), (min-width: 600px) and (max-height: 520px)');
+  const PHONE = matchMedia('(max-width: 599px)');
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const rnd = (a, b) => a + Math.random() * (b - a);
 
@@ -55,6 +58,7 @@
     current = name;
     document.body.dataset.screen = name;
     closeModelMenu();
+    setDrawer(false);
     for (const [key, el] of Object.entries(screens)) {
       const active = LAYERS[name].includes(key);
       if (active && !el.classList.contains('is-on')) {
@@ -89,7 +93,7 @@
       else Orb.to($('#slot-gen'), { opacity: 1 });
     },
     msg() {
-      Orb.to($('#slot-msg'), { opacity: 0.55, magnet: false });
+      Orb.to($('#slot-msg'), { opacity: FULL_MSG.matches ? 0 : 0.55, magnet: false });
       Orb.energy(0);
       playMessenger();
     },
@@ -170,6 +174,34 @@
   payBtn.addEventListener('click', pay);
   $$('#pay [data-close]').forEach(el => el.addEventListener('click', () => { Snd.tap(); go('home'); }));
 
+  // На телефоне шторку оплаты можно смахнуть вниз за ручку или шапку.
+  (function sheetDrag() {
+    const modal = $('#pay .modal');
+    let y0 = 0, dy = 0, t0 = 0, dragging = false;
+    modal.addEventListener('pointerdown', e => {
+      if (!PHONE.matches || e.target.closest('button') || !e.target.closest('.sheet-handle, .modal-top')) return;
+      dragging = true; y0 = e.clientY; dy = 0; t0 = performance.now();
+      modal.classList.add('is-dragging');
+      modal.setPointerCapture(e.pointerId);
+    });
+    modal.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      const raw = e.clientY - y0;
+      dy = raw > 0 ? raw : raw * 0.12;   // вверх — лёгкое сопротивление
+      modal.style.transform = `translateY(${dy.toFixed(1)}px)`;
+    });
+    const end = () => {
+      if (!dragging) return;
+      dragging = false;
+      const v = dy / Math.max(1, performance.now() - t0);
+      modal.classList.remove('is-dragging');
+      modal.style.transform = '';
+      if (dy > 110 || (dy > 30 && v > 0.55)) { Snd.tap(); go('home'); }
+    };
+    modal.addEventListener('pointerup', end);
+    modal.addEventListener('pointercancel', end);
+  })();
+
   /* ---------- генератор ---------- */
   const thread = $('#thread'), col = $('#col'), empty = $('#empty'), input = $('#input');
   const sendBtn = $('#send'), composer = $('#composer'), title = $('#gen-title');
@@ -185,6 +217,7 @@
         b.addEventListener('click', () => {
           $$('#hist button').forEach(x => x.classList.toggle('cur', x === b));
           Snd.tap();
+          setDrawer(false);
           newChat(true);
           runPrompt(E.g(t));
         });
@@ -247,7 +280,7 @@
   }
 
   function avatarClamp() {
-    const top = thread.getBoundingClientRect().top + 64 + 24;
+    const top = $('.gen-head').getBoundingClientRect().bottom + 20;
     const bottom = composer.getBoundingClientRect().top - 24;
     return [top, Math.max(top, bottom)];
   }
@@ -278,7 +311,34 @@
     if (current === 'gen') Orb.to($('#slot-gen'), { opacity: 1 });
     if (!silent) Snd.tap();
   }
-  $('#new-chat').addEventListener('click', () => { $$('#hist button').forEach(x => x.classList.remove('cur')); newChat(); });
+  $('#new-chat').addEventListener('click', () => { $$('#hist button').forEach(x => x.classList.remove('cur')); setDrawer(false); newChat(); });
+  $('#new-chat-m').addEventListener('click', () => { $$('#hist button').forEach(x => x.classList.remove('cur')); newChat(); });
+
+  /* ---------- выдвижное меню (планшет и телефон) ---------- */
+  const menuBtn = $('#menu-btn');
+  function setDrawer(open) {
+    const was = screens.gen.classList.contains('drawer-open');
+    if (was === open) return;
+    screens.gen.classList.toggle('drawer-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    Orb.hide(open);
+    if (open) $('#new-chat').focus({ preventScroll: true });
+  }
+  menuBtn.addEventListener('click', () => { Snd.tap(); setDrawer(!screens.gen.classList.contains('drawer-open')); });
+  $('#scrim').addEventListener('click', () => setDrawer(false));
+  window.addEventListener('resize', () => { if (innerWidth >= 1024) setDrawer(false); });
+
+  /* ---------- клавиатура телефона не закрывает поле ввода ---------- */
+  const composerWrap = $('.composer');
+  if (window.visualViewport) {
+    const vv = window.visualViewport;
+    const syncKb = () => {
+      const kb = Math.max(0, Math.round(innerHeight - vv.height - vv.offsetTop));
+      composerWrap.style.transform = kb > 40 ? `translateY(${-kb}px)` : '';
+    };
+    vv.addEventListener('resize', syncKb);
+    vv.addEventListener('scroll', syncKb);
+  }
 
   const ICONS = {
     more: '<svg viewBox="0 0 20 20"><path d="M10 3.5c.6 2.6 2.3 3.4 3.7 4.6 1.2 1 1.8 2.3 1.8 3.8a5.5 5.5 0 0 1-11 0c0-1.7.8-3 2-3.9-.1 1.3.4 2.2 1.3 2.6C7.4 7.9 8.6 5.7 10 3.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>',
@@ -598,6 +658,7 @@
     phField.innerHTML = '<span class="ph-ph">Сообщение</span>';
     phSend.classList.remove('on', 'press');
     msgCtrl.classList.remove('in');
+    screens.msg.classList.remove('is-done');
 
     await sleep(1100);
     if (!alive()) return;
@@ -645,6 +706,7 @@
     await sleep(1000);
     if (!alive()) return;
     msgCtrl.classList.add('in');
+    screens.msg.classList.add('is-done');
   }
   $('#msg-replay').addEventListener('click', () => { Snd.tap(); playMessenger(); });
 
@@ -657,7 +719,11 @@
   }
 
   const soundBtn = $('#sound');
-  const syncSound = on => soundBtn.setAttribute('aria-pressed', String(on));
+  const syncSound = on => {
+    soundBtn.setAttribute('aria-pressed', String(on));
+    $$('#sound-seg button').forEach(b => b.classList.toggle('on', (b.dataset.s === 'on') === on));
+  };
+  $$('#sound-seg button').forEach(b => b.addEventListener('click', () => Snd.setEnabled(b.dataset.s === 'on')));
   syncSound(Snd.enabled);
   Snd.onChange(syncSound);
   soundBtn.addEventListener('click', () => Snd.setEnabled(!Snd.enabled));
@@ -683,6 +749,7 @@
       case 'Escape':
         if (current === 'pay') go('home');
         closeModelMenu();
+        setDrawer(false);
         break;
       default: return;
     }

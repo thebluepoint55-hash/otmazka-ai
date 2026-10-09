@@ -2,7 +2,10 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#F3F4F8">
+<meta name="description" content="Отмаз Pro — нейросеть ОТМАЗ-4 Turbo, которая врёт начальнику за вас. Пародия на премиальный ИИ-стартап.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236D5BFF'/%3E%3Cstop offset='.6' stop-color='%23FF7AC6'/%3E%3Cstop offset='1' stop-color='%2357D8FF'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='11' cy='10' r='5' fill='%23fff' opacity='.55'/%3E%3C/svg%3E">
 <title>Отмаз Pro · ОТМАЗ-4 Turbo</title>
 <style>html,body{background:#F3F4F8;margin:0}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -54,7 +57,7 @@
       <button class="cta cta-main" data-go="pay">Попробовать Pro<span class="arr">→</span></button>
       <button class="cta cta-ghost" data-demo><i class="play"></i>Смотреть демо</button>
     </div>
-    <p class="hero-micro" data-in style="--i:5">Отмена в любой момент · Совесть не требуется · 0 увольнений</p>
+    <p class="hero-micro" data-in style="--i:5">Отмена в&nbsp;любой момент · Совесть не&nbsp;требуется · 0&nbsp;увольнений</p>
   </div>
 
   <div class="trust" data-in style="--i:6">
@@ -71,6 +74,7 @@
 <section class="screen screen-pay" id="pay" aria-label="Оплата">
   <div class="dim" data-close></div>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pay-title">
+    <i class="sheet-handle" aria-hidden="true"></i>
     <div class="modal-top">
       <span class="logo logo-sm"><i class="logo-mark"></i>отмаз.ai</span>
       <span class="test-tag">Тестовый режим</span>
@@ -117,7 +121,8 @@
 
 <!-- ============ 3. ГЕНЕРАТОР ============ -->
 <section class="screen screen-gen" id="gen" aria-label="Генератор">
-  <aside class="side" data-in style="--i:0">
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+  <aside class="side" id="side" data-in style="--i:0">
     <div class="side-top">
       <a class="logo" href="#" data-go="home"><i class="logo-mark"></i>отмаз.ai</a>
       <span class="pro-badge">PRO</span>
@@ -125,6 +130,7 @@
     <button class="side-new" id="new-chat"><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Новая отмазка</button>
     <nav class="hist" id="hist"></nav>
     <div class="side-foot">
+      <div class="voice voice-sound"><span>Звук</span><div class="seg" id="sound-seg"><button data-s="on">вкл</button><button data-s="off">выкл</button></div></div>
       <div class="voice"><span>Пишу от лица</span><div class="seg" id="gender"><button data-g="m">он</button><button data-g="f">она</button></div></div>
       <div class="plan">
         <div class="plan-top"><b>Отмаз Pro</b><span>Безлимит</span></div>
@@ -136,6 +142,7 @@
 
   <div class="gen-main">
     <header class="gen-head" data-in style="--i:1">
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Меню" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 20 20"><path d="M3.5 6h13M3.5 10h13M3.5 14h8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
       <div class="gen-title" id="gen-title">Новая отмазка</div>
       <div class="model-wrap">
         <button class="model-pill" id="model-pill" aria-haspopup="listbox" aria-expanded="false"><i class="live"></i><span id="model-name">ОТМАЗ-4 Turbo</span><svg viewBox="0 0 20 20"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -145,7 +152,7 @@
           <button role="option" disabled><b>ОТМАЗ-1 Честный</b><small>Говорит правду. Не рекомендуем</small></button>
         </div>
       </div>
-      <div class="head-actions"><button class="ghost-btn">Поделиться</button><span class="me-av">Я</span></div>
+      <div class="head-actions"><button class="ghost-btn share-btn">Поделиться</button><span class="me-av">Я</span><button class="icon-btn icon-new" id="new-chat-m" aria-label="Новая отмазка"><svg viewBox="0 0 20 20"><path d="M11 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9M15.2 3.4a1.4 1.4 0 0 1 2 2L10.5 12l-2.8.8.8-2.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     </header>
 
     <div class="thread" id="thread">
@@ -182,7 +189,7 @@
       <div class="ph-screen">
         <div class="ph-status"><b id="ph-clock">9:41</b><span class="ph-icons"><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2"/><rect x="24" y="4" width="1.6" height="4" rx=".8" opacity=".4"/></svg></span></div>
         <div class="ph-head">
-          <svg class="ph-back" viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <button class="ph-back" data-go="gen" aria-label="Назад к генератору"><svg viewBox="0 0 20 20"><path d="M12.5 4 6.5 10l6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <span class="ph-av">ИП</span>
           <div class="ph-who"><b>Игорь Петрович</b><small id="ph-state">был недавно</small></div>
           <svg class="ph-call" viewBox="0 0 20 20"><path d="M6.6 3.5 8.4 7 6.9 8.6a9 9 0 0 0 4.5 4.5L13 11.6l3.5 1.8-.6 2.7c-.2.6-.8 1-1.4.9C8.6 16.4 3.6 11.4 3 5.5c0-.7.3-1.2.9-1.4z" fill="currentColor"/></svg>
