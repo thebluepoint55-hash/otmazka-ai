@@ -947,6 +947,96 @@ li.done .st-r { opacity: 1; }
   body[data-screen="msg"] .sound { display: none; }
 }
 
+/* =========================================================
+   ИНТЕРАКТИВНЫЙ ТУР
+   Затемнение пропускает клики: пользователь нажимает настоящие кнопки.
+   ========================================================= */
+.tour {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  opacity: 0; visibility: hidden;
+  transition: opacity .3s var(--ease-out), visibility 0s linear .3s;
+}
+.tour.on { opacity: 1; visibility: visible; transition: opacity .3s var(--ease-out), visibility 0s; }
+.tour-dim { position: absolute; inset: 0; background: rgba(13, 15, 26, .36); opacity: 0; transition: opacity .3s var(--ease-out); }
+.tour.no-hole .tour-dim { opacity: 1; }
+.tour-hole {
+  position: absolute; left: 0; top: 0; width: 0; height: 0; border-radius: 16px;
+  box-shadow: 0 0 0 200vmax rgba(13, 15, 26, .36);
+  will-change: transform;
+  transition: opacity .25s var(--ease-out);
+}
+.tour.no-hole .tour-hole { opacity: 0; }
+.tour-ring { position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 2px var(--iris); }
+.tour-ring::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  box-shadow: 0 0 0 2px rgba(109, 91, 255, .55);
+  animation: tourPulse 1.8s var(--ease-out) infinite;
+}
+@keyframes tourPulse { from { transform: scale(1); opacity: 1; } to { transform: scale(1.08); opacity: 0; } }
+
+.tour-card {
+  position: absolute; left: 0; top: 0;
+  width: min(340px, calc(100vw - 32px));
+  padding: 16px 18px 14px; border-radius: 20px; background: #fff;
+  pointer-events: auto;
+  box-shadow: 0 0 0 1px rgba(13, 15, 26, .06), 0 30px 60px -24px rgba(13, 15, 26, .5), 0 12px 30px -16px rgba(109, 91, 255, .35);
+  will-change: transform;
+}
+.tour-card::before {
+  content: ''; position: absolute; left: var(--caret, 50%); width: 14px; height: 14px; margin-left: -7px;
+  background: #fff; border-radius: 3px; transform: rotate(45deg);
+}
+.tour-card[data-place="below"]::before { top: -6px; }
+.tour-card[data-place="above"]::before { bottom: -6px; }
+.tour-card[data-place="side"]::before, .tour-card.is-welcome::before { display: none; }
+.tour-card.is-welcome { width: min(400px, calc(100vw - 32px)); padding: 22px 22px 18px; }
+.tour-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font: 500 11px var(--mono); color: var(--slate-ink); }
+.tour-dots { display: flex; gap: 3px; }
+.tour-dots i { width: 14px; height: 4px; border-radius: 2px; background: #E6E8EF; transition: background .3s ease; }
+.tour-dots i.on { background: var(--grad); }
+.is-welcome .tour-dots { display: none; }
+.tour-title { margin-top: 10px; font-size: 17px; font-weight: 800; letter-spacing: -.03em; line-height: 1.2; text-wrap: balance; }
+.is-welcome .tour-title { font-size: 22px; letter-spacing: -.035em; }
+.tour-text { margin-top: 6px; font-size: 14px; line-height: 1.5; font-weight: 500; color: var(--soft); text-wrap: pretty; }
+.tour-foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.tour-skip { margin-right: auto; padding: 8px 2px; font-size: 13px; font-weight: 600; color: var(--slate-ink); transition: color .2s ease; }
+.tour-action { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 10px; background: rgba(109, 91, 255, .08); color: #5444E0; font-size: 12.5px; font-weight: 700; }
+.tour-action svg { width: 16px; height: 16px; flex: none; }
+.tour-next {
+  height: 38px; padding: 0 16px; border-radius: 12px; background: var(--ink); color: #fff; font-weight: 700; font-size: 13.5px;
+  transition: transform .14s var(--ease-out);
+}
+.tour-next:active { transform: scale(.97); }
+.tour-action[hidden], .tour-next[hidden], .tour-skip[hidden] { display: none; }
+@media (hover: hover) and (pointer: fine) { .tour-skip:hover { color: var(--ink); } }
+
+.tour-help {
+  position: fixed; right: 72px; bottom: 20px; z-index: 50;
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .85); box-shadow: var(--shadow-card); color: var(--soft);
+  transition: transform .14s var(--ease-out), color .2s ease;
+}
+.tour-help svg { width: 20px; height: 20px; }
+.tour-help:active { transform: scale(.92); }
+@media (hover: hover) and (pointer: fine) { .tour-help:hover { color: var(--ink); } }
+
+.side-tour {
+  display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 10px; border-radius: 10px;
+  font-size: 13.5px; font-weight: 600; color: var(--soft); text-align: left;
+  transition: background .2s ease, color .2s ease;
+}
+.side-tour svg { width: 18px; height: 18px; color: var(--iris); flex: none; }
+@media (hover: hover) and (pointer: fine) { .side-tour:hover { background: rgba(255, 255, 255, .65); color: var(--ink); } }
+
+@media (pointer: coarse) { .tour-help { width: 44px; height: 44px; right: 76px; } .tour-next { height: 44px; } }
+@media (max-width: 1023px) { body[data-screen="gen"] .tour-help { display: none; } }
+@media (max-width: 599px) {
+  .tour-help { right: 72px; bottom: calc(16px + env(safe-area-inset-bottom)); }
+  body[data-screen="msg"] .tour-help, body[data-screen="pay"] .tour-help { display: none; }
+}
+@media (min-width: 600px) and (max-height: 520px) { body[data-screen="msg"] .tour-help { display: none; } }
+@media (prefers-reduced-motion: reduce) { .tour-ring::after { animation: none; } }
+
 /* ---------- reduced motion: меньше движения, переходы остаются через прозрачность ---------- */
 @media (prefers-reduced-motion: reduce) {
   .screen, .screen.is-on, .screen.is-leaving { transform: none; }
