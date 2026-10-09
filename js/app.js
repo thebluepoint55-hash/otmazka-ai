@@ -647,8 +647,10 @@
     let choice, level, text;
     if (curBot && curBot.text) { choice = curBot.choice; level = curBot.level; text = curBot.text; }
     else { choice = E.createChoice('absent'); level = E.DEFAULT_LEVEL; text = E.compose(choice, level).text; }
-    // Сработает или нет — чистый случай, правдоподобие тут ничего не гарантирует.
-    const ok = Math.random() < 0.5;
+    // Первая отправка за сессию всегда проходит, вторая всегда проваливается,
+    // дальше — чистый случай 50/50. Правдоподобие тут ничего не гарантирует.
+    const attempt = score.win + score.lose;
+    const ok = attempt === 0 ? true : attempt === 1 ? false : Math.random() < 0.5;
     const replies = E.bossReply(choice, level, ok);
 
     const now = new Date();
@@ -746,6 +748,7 @@
     newChat(true);
     resetPay();
     msgRun++;
+    score.win = score.lose = 0;
     $$('#hist button').forEach(x => x.classList.remove('cur'));
   }
 
